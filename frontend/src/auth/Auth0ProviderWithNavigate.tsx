@@ -1,12 +1,29 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import {AppState, Auth0Provider, User} from "@auth0/auth0-react"
 
-const Auth0ProviderWithNavigate = props => {
-  return (
-    <div>Auth0ProviderWithNavigate</div>
-  )
+type Props = {
+  children: React.ReactNode;
 }
 
-Auth0ProviderWithNavigate.propTypes = {}
+const Auth0ProviderWithNavigate = ({ children }: Props) => {
+    const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+    const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+    const redirectUri = import.meta.env.VITE_AUTH0_CALLBACK_URL;
+
+    if(!domain || !clientId || !redirectUri){
+        throw new Error("unable to initialise auth")
+    }
+
+    const onRedirectCallback = (appState?: AppState, user?: User) => {
+        console.log("USER", user)
+    }
+
+    return(
+        <Auth0Provider domain={domain} clientId={clientId} authorizationParams={{
+            redirect_uri: redirectUri
+        }} onRedirectCallback={onRedirectCallback}> 
+            {children}
+        </Auth0Provider>
+    )
+}
 
 export default Auth0ProviderWithNavigate
